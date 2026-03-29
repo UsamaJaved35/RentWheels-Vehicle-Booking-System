@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const Customer = require("../models/Customer");
+const Booking = require("../models/Booking");
 
 exports.getAll = async (_req, res, next) => {
   try {
@@ -60,6 +61,17 @@ exports.update = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
+    const activeBookings = await Booking.countDocuments({
+      customer: req.params.id,
+      status: { $in: ["active", "pending"] },
+    });
+
+    if (activeBookings > 0) {
+      return res.status(400).json({
+        message: "Cannot delete customer with active or pending bookings",
+      });
+    }
+
     const customer = await Customer.findByIdAndDelete(req.params.id);
     if (!customer) {
       return res.status(404).json({ message: "Customer not found" });

@@ -103,8 +103,9 @@ export default function Vehicles() {
       toast.success("Vehicle deleted");
       setDeleteTarget(null);
       fetchVehicles();
-    } catch {
-      toast.error("Delete failed");
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Delete failed";
+      toast.error(msg);
     } finally {
       setDeleting(false);
     }

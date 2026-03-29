@@ -79,8 +79,9 @@ export default function Customers() {
       toast.success("Customer deleted");
       setDeleteTarget(null);
       fetchCustomers();
-    } catch {
-      toast.error("Delete failed");
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Delete failed";
+      toast.error(msg);
     } finally {
       setDeleting(false);
     }
